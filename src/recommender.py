@@ -37,13 +37,19 @@ class UserProfile:
 # ---------------------------------------------------------------------------
 # Scoring recipe
 #
-#   Genre match      +3.0  pts  — heaviest: the core of a listener's taste
+#   Genre match      +1.5  pts  — tiebreaker, not a trump card
 #   Mood match       +2.0  pts  — emotional vibe is non-negotiable
-#   Energy closeness  0–2.0 pts  — 2.0 × (1 − |song.energy − target|)
-#   Valence closeness 0–1.5 pts  — 1.5 × (1 − |song.valence − target|)
+#   Energy closeness  0–3.0 pts  — 3.0 × (1 − |song.energy − target|)
+#   Valence closeness 0–2.0 pts  — 2.0 × (1 − |song.valence − target|)
 #   Acoustic bonus   +0.5  pts  — if likes_acoustic and acousticness > 0.6
 #
 #   Maximum possible: 9.0 pts
+#
+#   Rationale: lowering genre from 3.0 → 1.5 prevents a single genre tag
+#   from overriding feel. Raising energy (2.0 → 3.0) and valence (1.5 → 2.0)
+#   lets audio-feature similarity compete on equal footing, mirroring how
+#   real recommenders (e.g. Spotify's audio features) weight continuous
+#   signals over categorical labels.
 # ---------------------------------------------------------------------------
 
 def _score(
@@ -59,18 +65,18 @@ def _score(
     reasons = []
 
     if song.genre == genre:
-        score += 3.0
-        reasons.append("genre match (+3.0)")
+        score += 1.5
+        reasons.append("genre match (+1.5)")
 
     if song.mood == mood:
         score += 2.0
         reasons.append("mood match (+2.0)")
 
-    energy_pts = 2.0 * (1.0 - abs(song.energy - target_energy))
+    energy_pts = 3.0 * (1.0 - abs(song.energy - target_energy))
     score += energy_pts
     reasons.append(f"energy fit +{energy_pts:.2f}")
 
-    valence_pts = 1.5 * (1.0 - abs(song.valence - target_valence))
+    valence_pts = 2.0 * (1.0 - abs(song.valence - target_valence))
     score += valence_pts
     reasons.append(f"valence fit +{valence_pts:.2f}")
 
