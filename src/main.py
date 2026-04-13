@@ -157,6 +157,7 @@ def run_profile(user_prefs: dict, songs: list, k: int = 5) -> None:
 
 def main() -> None:
     songs = load_songs(SONGS_CSV)
+    print("Welcome to Sound Zilla AI! Your personalized music recommendation engine.\n")
     print(f"Loaded {len(songs)} songs from catalog.\n")
 
     for profile in ALL_PROFILES:
