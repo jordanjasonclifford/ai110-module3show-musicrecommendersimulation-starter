@@ -9,28 +9,25 @@ Example: **VibeFinder 1.0**
 
 ## 2. Intended Use  
 
-Describe what your recommender is designed to do and who it is for. 
+This recommender is meant to suggest songs based on how they actually feel, not just what they’re called or who made them. The goal is to take a user’s preferences and return a ranked list of songs that match that vibe as closely as possible, using things like genre, mood, energy, and overall emotional tone (valence).
 
-Prompts:  
+It assumes the user can describe what they want upfront. Things like what genre they like, what mood they’re in, how energetic they want the music to be, and whether they lean more acoustic. It does not learn from history or adapt over time, it just works off that one snapshot of preferences.
 
-- What kind of recommendations does it generate  
-- What assumptions does it make about the user  
-- Is this for real users or classroom exploration  
+This is mainly a classroom project to show how a basic content-based recommender works. It is not trying to be a real production system or handle personalization at scale.
 
 ---
 
 ## 3. How the Model Works  
 
-Explain your scoring approach in simple language.  
+Each song is basically treated like a set of traits that describe its vibe. The main ones I focus on are genre, mood, energy, and valence. Together, these give a pretty solid picture of how a song feels, whether that is high energy and upbeat or slow and more melancholic.
 
-Prompts:  
+When a user gives their preferences, the system goes through every song and compares those traits directly. If the genre matches, it gets a solid boost. If the mood matches, it gets another boost. For things like energy and valence, it is not exact matching, instead the system gives more credit the closer the song is to the user’s target.
 
-- What features of each song are used (genre, energy, mood, etc.)  
-- What user preferences are considered  
-- How does the model turn those into a score  
-- What changes did you make from the starter logic  
+Every song ends up with a total score based on those comparisons. Then everything is ranked from highest to lowest, and the top songs are returned. The ones that match across most of the features naturally rise to the top, and weaker matches fall lower.
 
-Avoid code here. Pretend you are explaining the idea to a friend who does not program.
+The main difference from the starter version is that everything is based on actual musical features. Things like title, ID, or artist are ignored since they do not really tell you if someone will like a song.
+
+Avoid code here. 
 
 ---
 

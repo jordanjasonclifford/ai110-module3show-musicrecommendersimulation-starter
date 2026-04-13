@@ -17,17 +17,44 @@ Replace this paragraph with your own summary of what your version does.
 
 ## How The System Works
 
-Explain your design in plain language.
+This system is a simple content-based recommender that suggests songs based on how they feel, not just surface-level info like title or artist. Each `Song` is represented using features that describe its vibe: genre, mood, energy, tempo, valence (emotional brightness), danceability, and acousticness.
 
-Some prompts to answer:
+The `UserProfile` stores a snapshot of the listener’s preferences — preferred genre and mood, target values for energy and valence, and whether they like acoustic textures. The system assumes the user can describe what they want upfront and uses that as the baseline for every comparison.
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+The `Recommender` loops through every song in the catalog, scores it against the user profile, then returns the top K highest-scoring results.
 
-You can include a simple diagram or bullet list if helpful.
+At a high level, the flow looks like this:
+
+<img src="images/AI_MusicRecommenderDiagram.png">
+
+### Algorithm Recipe
+
+Each song is scored out of a maximum of **9.0 points**:
+
+| Signal | Points | Method |
+|---|---|---|
+| Genre match | +3.0 | Exact match — heaviest weight, the core of a listener’s taste |
+| Mood match | +2.0 | Exact match — emotional vibe is non-negotiable |
+| Energy closeness | 0 – 2.0 | `2.0 × (1 − \|song.energy − target\|)` — rewards proximity, not just high or low |
+| Valence closeness | 0 – 1.5 | `1.5 × (1 − \|song.valence − target\|)` — aligns brightness/happiness tone |
+| Acoustic bonus | +0.5 | Awarded when `likes_acoustic = True` and `song.acousticness > 0.6` |
+
+Genre and mood together account for **5.0 of 9.0 points (56%)**, making them the dominant signals. Energy and valence add up to **3.5 points** of continuous similarity, so a song that nearly matches on feel but misses the genre label can still rank competitively. The acoustic bonus is a small tiebreaker for texture preference.
+
+### Potential Biases
+
+- **Genre dominance.** Because genre is worth 3.0 points on its own, a song in the wrong genre but with a perfect mood, energy, and valence fit will almost always lose to a same-genre song with mediocre feel. A great folk song will never surface for a pop user, even if the vibe is identical.
+- **Exact-match brittleness.** Genre and mood are matched as exact strings. "indie pop" and "pop" are treated as completely different, so a user who loves pop may never see "Rooftop Lights" ranked as high as it deserves.
+- **No diversity.** The system always returns the closest matches, which can mean recommending the same artist or sound repeatedly. There is no mechanism to spread results across different styles.
+- **User profile is static.** The system has no memory of what the user has already heard or skipped. It scores every song the same way every time.
+
+
+# CLI Verification
+
+A sample run of the main.py reveals recommendations, their scores, and the reasoning behind those scores:
+
+<img src="images/RecommendationsRun1.png">
+
 
 ---
 
